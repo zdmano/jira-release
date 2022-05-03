@@ -15,7 +15,8 @@ const releaseName = (projectKey, component, version) => {
   }
 
   release.push(cleanVersion);
-  return release.join(' ');
+  // return release.join(' ');
+  return version;
 };
 
 const getOrCreateRelease = async (client, { key, id }, name) => {
@@ -49,6 +50,7 @@ const createJiraRelease = async ({
   projectKey,
   component,
   version,
+  publishVersion
 }) => {
   const client = new JiraClient({
     protocol,
@@ -80,7 +82,7 @@ const createJiraRelease = async ({
   });
   await Promise.all(requests);
 
-  if (!release.released) {
+  if (!release.released && publishVersion) {
     core.info(`Release version ${name}`);
     await client.updateVersion({
       id: release.id,
@@ -94,7 +96,7 @@ const createJiraRelease = async ({
       return null;
     });
   } else {
-    core.warning(`Version ${name} was already released in JIRA`);
+    core.warning(`Version ${name} was already released in JIRA or publish option is false`);
   }
 
   // Return the release name

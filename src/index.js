@@ -10,6 +10,7 @@ const action = async () => {
   const projectKey = core.getInput('jira-project', { required: true });
   const component = core.getInput('jira-component') || '';
   const version = core.getInput('version', { required: true });
+  const publishVersion = core.getInput('publish' || false)
 
   await createJiraRelease({
     protocol,
@@ -17,6 +18,7 @@ const action = async () => {
     projectKey,
     component,
     version,
+    publishVersion
   });
 };
 

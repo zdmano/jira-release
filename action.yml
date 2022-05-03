@@ -19,6 +19,9 @@ inputs:
   version:
     description: The semantic version number to create a release for
     required: true
+  publish:
+    description: Set this to release the version on jira
+    required: false
 runs:
   using: node12
   main: dist/index.js
