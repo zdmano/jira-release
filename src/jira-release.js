@@ -1,7 +1,7 @@
 const core = require('@actions/core');
 const JiraClient = require('jira-client');
 const semver = require('semver');
-const { findJiraChanges } = require('../../jira-releasenotes/src/jira-releasenotes');
+// const { findJiraChanges } = require('../../jira-releasenotes/src/jira-releasenotes');
 
 const releaseName = (projectKey, component, version) => {
   const release = [projectKey];
@@ -71,16 +71,16 @@ const createJiraRelease = async ({
 
   const release = await getOrCreateRelease(client, project, name);
 
-  const changes = await findJiraChanges(projectKey);
-  const requests = [];
-  Object.keys(changes).forEach((issueKey) => {
-    requests.push(
-      client.updateIssue(issueKey, createUpdate(release)).then(() => {
-        core.info(`Issue ${issueKey} was updated with fix version`);
-      }),
-    );
-  });
-  await Promise.all(requests);
+  // const changes = await findJiraChanges(projectKey);
+  // const requests = [];
+  // Object.keys(changes).forEach((issueKey) => {
+  //   requests.push(
+  //     client.updateIssue(issueKey, createUpdate(release)).then(() => {
+  //       core.info(`Issue ${issueKey} was updated with fix version`);
+  //     }),
+  //   );
+  // });
+  // await Promise.all(requests);
 
   if (!release.released && publishVersion) {
     core.info(`Release version ${name}`);
