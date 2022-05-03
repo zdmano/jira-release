@@ -1,6 +1,6 @@
 {
   "name": "jira-release",
-  "version": "0.0.1-local",
+  "version": "0.0.1",
   "description": "Create and populate a JIRA release from conventional commit conventions",
   "private": true,
   "main": "src/index.js",
