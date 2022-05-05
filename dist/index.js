@@ -45129,6 +45129,7 @@ const action = async () => {
   const version = core.getInput('version', { required: true });
   const publishVersion = core.getInput('publish') || false;
   const jiraKeys = core.getInput('jira-keys') || '';
+  const releaseUrl = core.getInput('release-url') || undefined;
 
   await createJiraRelease({
     protocol,
@@ -45137,7 +45138,8 @@ const action = async () => {
     component,
     version,
     publishVersion,
-    jiraKeys
+    jiraKeys,
+    releaseUrl
   });
 };
 
@@ -45174,7 +45176,7 @@ const releaseName = (projectKey, component, version) => {
   return version;
 };
 
-const getOrCreateRelease = async (client, { key, id }, name) => {
+const getOrCreateRelease = async (client, { key, id }, name, releaseurl) => {
   const releases = await client.getVersions(key);
   const existingRelease = releases.find((release) => release.name === name);
   if (existingRelease) {
@@ -45186,7 +45188,7 @@ const getOrCreateRelease = async (client, { key, id }, name) => {
   core.info(`Create new JIRA release '${name}'`);
   return client.createVersion({
     name,
-    description: 'Created by GitHub Actions.',
+    description: releaseurl ? releaseurl : 'Created by GitHub Actions.',
     projectId: id,
   });
 };
@@ -45206,7 +45208,8 @@ const createJiraRelease = async ({
   component,
   version,
   publishVersion,
-  jiraKeys
+  jiraKeys,
+  releaseUrl
 }) => {
   const client = new JiraClient({
     protocol,
@@ -45242,7 +45245,7 @@ const createJiraRelease = async ({
       throw new Error(`'${component}' is not a valid JIRA component in project '${projectKey}'`);
     }
 
-    const release = await getOrCreateRelease(client, project, name);
+    const release = await getOrCreateRelease(client, project, name, releaseUrl);
     console.log(release);
     const requests = [];
     await issueKeys.forEach(async (issue) => {

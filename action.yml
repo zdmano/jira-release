@@ -27,6 +27,9 @@ inputs:
   jira-keys:
     description: A string of jira keys seperated by commas
     required: false
+  release-url:
+    description: The URL where the release can be accessed
+    required: false
 runs:
   using: node12
   main: dist/index.js
