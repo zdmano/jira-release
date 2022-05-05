@@ -82,11 +82,12 @@ const createJiraRelease = async ({
     }
   
     const release = await getOrCreateRelease(client, project, name);
+    console.log(JSON.parse(release));
     const requests = [];
     for(issue in issueKeys) {
       requests.push(
-        client.updateIssue(issueKey, createUpdate(release)).then(() => {
-          core.info(`Issue ${issueKey} was updated with fix version`);
+        client.updateIssue(issue, createUpdate(release)).then(() => {
+          core.info(`Issue ${issue} was updated with fix version`);
         }),
       );
     }
