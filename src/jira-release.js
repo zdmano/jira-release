@@ -73,7 +73,7 @@ const createJiraRelease = async ({
   console.log(`Found the following Jira projects ${[...projectKeys]}`);
   console.log(`found the following Jira keys ${[...issueKeys]}`);
 
- for(const projectKey in projectKeys) {
+ await projectKeys.forEach(async (projectKey) =>  {
     console.log(`Starting jira update for ${projectKey}`);
     const name = releaseName(projectKey, component, version);
 
@@ -82,7 +82,7 @@ const createJiraRelease = async ({
     if (component && !project.components.find((list) => list.name === component)) {
       throw new Error(`'${component}' is not a valid JIRA component in project '${projectKey}'`);
     }
-  
+
     const release = await getOrCreateRelease(client, project, name);
     console.log(JSON.parse(release));
     const requests = [];
@@ -95,7 +95,7 @@ const createJiraRelease = async ({
     }
     await Promise.all(requests);
 
-  }
+  });
 
 
 
