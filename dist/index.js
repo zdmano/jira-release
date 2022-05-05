@@ -45219,19 +45219,21 @@ const createJiraRelease = async ({
 
   const issueKeys = new Set(String(jiraKeys).split(","));
 
-  var projectKeys = new Set();
+  let projectKeys = new Set();
   
   for (const issue of issueKeys) {
-    const[prjKey] = issue.split('-'); 
-    projectKeys.add(prjKey)
+    const[projectKey] = issue.split('-'); 
+    projectKeys.add(projectKey)
   }
   console.log(`Found the following Jira projects ${[...projectKeys]}`);
   console.log(`found the following Jira keys ${[...issueKeys]}`);
 
-  for(const prjKey in projectKeys) {
-    const name = releaseName(prjKey, component, version);
+  for(const projectKey in projectKeys) {
+    console.log(`Starting jira update for ${projectKey}`);
+    const name = releaseName(projectKey, component, version);
 
-    const project = await client.getProject(prjKey);
+    const project = await client.getProject(projectKey);
+    console.log(`Found project ${JSON.parse(project)}`);
     if (component && !project.components.find((list) => list.name === component)) {
       throw new Error(`'${component}' is not a valid JIRA component in project '${projectKey}'`);
     }
@@ -45246,7 +45248,7 @@ const createJiraRelease = async ({
         }),
       );
     }
-    await Promise.all(requests)
+    await Promise.all(requests);
 
   }
 
