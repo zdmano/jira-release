@@ -45127,7 +45127,8 @@ const action = async () => {
   const projectKey = core.getInput('jira-project', { required: true });
   const component = core.getInput('jira-component') || '';
   const version = core.getInput('version', { required: true });
-  const publishVersion = core.getInput('publish' || 0)
+  const publishVersion = core.getInput('publish') || false;
+  const jiraKeys = core.getInput('jira-keys') || '';
 
   await createJiraRelease({
     protocol,
@@ -45135,7 +45136,8 @@ const action = async () => {
     projectKey,
     component,
     version,
-    publishVersion
+    publishVersion,
+    jiraKeys
   });
 };
 
@@ -45203,7 +45205,8 @@ const createJiraRelease = async ({
   projectKey,
   component,
   version,
-  publishVersion
+  publishVersion,
+  jiraKeys
 }) => {
   const client = new JiraClient({
     protocol,
@@ -45214,46 +45217,68 @@ const createJiraRelease = async ({
     strictSSL: protocol === 'https',
   });
 
-  const name = releaseName(projectKey, component, version);
+  const issueKeys = new Set(String(jiraKeys).split(","));
 
-  const project = await client.getProject(projectKey);
+  var projectKeys = new Set();
+  
+  for (const issue of issueKeys) {
+    const[prjKey] = issue.split('-'); 
+    projectKeys.add(prjKey)
+  }
+  console.log(`Found the following Jira projects ${[...projectKeys]}`);
+  console.log(`found the following Jira keys ${[...issueKeys]}`);
 
-  if (component && !project.components.find((list) => list.name === component)) {
-    throw new Error(`'${component}' is not a valid JIRA component in project '${projectKey}'`);
+  for(prjKey in projectKeys) {
+    const name = releaseName(prjKey, component, version);
+
+    const project = await client.getProject(prjKey);
+    if (component && !project.components.find((list) => list.name === component)) {
+      throw new Error(`'${component}' is not a valid JIRA component in project '${projectKey}'`);
+    }
+  
+    const release = await getOrCreateRelease(client, project, name);
+    const requests = [];
+    for(issue in issueKeys) {
+      requests.push(
+        client.updateIssue(issueKey, createUpdate(release)).then(() => {
+          core.info(`Issue ${issueKey} was updated with fix version`);
+        }),
+      );
+    }
+    await Promise.all(requests)
+
   }
 
-  const release = await getOrCreateRelease(client, project, name);
+
+
+
+
 
   // const changes = await findJiraChanges(projectKey);
-  // const requests = [];
   // Object.keys(changes).forEach((issueKey) => {
-  //   requests.push(
-  //     client.updateIssue(issueKey, createUpdate(release)).then(() => {
-  //       core.info(`Issue ${issueKey} was updated with fix version`);
-  //     }),
-  //   );
+
   // });
   // await Promise.all(requests);
 
-  if (!release.released && publishVersion) {
-    core.info(`Release version ${name}`);
-    await client.updateVersion({
-      id: release.id,
-      projectId: release.projectId,
-      releaseDate: new Date().toISOString().split('T')[0],
-      released: true,
-    }).then(() => {
-      core.info(`Version ${name} is now released`);
-    }).catch((err) => {
-      core.error(`Failed to release version ${name}. It must be manually released in JIRA. Reason: ${err.message}`);
-      return null;
-    });
-  } else {
-    core.warning(`Version ${name} was already released in JIRA or publish option is false`);
-  }
+  // if (!release.released && publishVersion) {
+  //   core.info(`Release version ${name}`);
+  //   await client.updateVersion({
+  //     id: release.id,
+  //     projectId: release.projectId,
+  //     releaseDate: new Date().toISOString().split('T')[0],
+  //     released: true,
+  //   }).then(() => {
+  //     core.info(`Version ${name} is now released`);
+  //   }).catch((err) => {
+  //     core.error(`Failed to release version ${name}. It must be manually released in JIRA. Reason: ${err.message}`);
+  //     return null;
+  //   });
+  // } else {
+  //   core.warning(`Version ${name} was already released in JIRA or publish option is false`);
+  // }
 
   // Return the release name
-  return name;
+  return true;
 };
 
 module.exports = {
