@@ -45228,7 +45228,7 @@ const createJiraRelease = async ({
   console.log(`Found the following Jira projects ${[...projectKeys]}`);
   console.log(`found the following Jira keys ${[...issueKeys]}`);
 
-  for(const projectKey in projectKeys) {
+ for(const projectKey in projectKeys) {
     console.log(`Starting jira update for ${projectKey}`);
     const name = releaseName(projectKey, component, version);
 
@@ -45281,6 +45281,7 @@ const createJiraRelease = async ({
   // }
 
   // Return the release name
+  console.log('Done');
   return true;
 };
 
