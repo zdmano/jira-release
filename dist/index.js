@@ -45228,7 +45228,7 @@ const createJiraRelease = async ({
   console.log(`Found the following Jira projects ${[...projectKeys]}`);
   console.log(`found the following Jira keys ${[...issueKeys]}`);
 
-  for(prjKey in projectKeys) {
+  for(const prjKey in projectKeys) {
     const name = releaseName(prjKey, component, version);
 
     const project = await client.getProject(prjKey);
@@ -45239,7 +45239,7 @@ const createJiraRelease = async ({
     const release = await getOrCreateRelease(client, project, name);
     console.log(JSON.parse(release));
     const requests = [];
-    for(issue in issueKeys) {
+    for(const issue in issueKeys) {
       requests.push(
         client.updateIssue(issue, createUpdate(release)).then(() => {
           core.info(`Issue ${issue} was updated with fix version`);
