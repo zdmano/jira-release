@@ -62,11 +62,13 @@ const createJiraRelease = async ({
     strictSSL: protocol === 'https',
   });
 
-  const issueKeys = new Set(String(jiraKeys).split(","));
-  if(issueKeys == undefined || issueKeys.size < 1) {
+  if(jiraKeys.length < 1) {
     console.log('No Jira keys provided ... quiting');
     return true;
-  } 
+  }
+
+
+  const issueKeys = new Set(String(jiraKeys).split(","));
   let projectKeys = new Set();
   
   for (const issue of issueKeys) {
