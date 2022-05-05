@@ -4,7 +4,8 @@ description: |
 inputs:
   jira-project:
     description: The JIRA project key
-    required: true
+    required: false
+    default: N/A
   jira-component:
     description: The JIRA component to release
     required: false
@@ -21,6 +22,10 @@ inputs:
     required: true
   publish:
     description: Set this to release the version on jira
+    required: false
+    default: false
+  jira-keys:
+    description: A string of jira keys seperated by commas
     required: false
 runs:
   using: node12
