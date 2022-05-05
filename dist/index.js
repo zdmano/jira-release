@@ -45233,21 +45233,20 @@ const createJiraRelease = async ({
     const name = releaseName(projectKey, component, version);
 
     const project = await client.getProject(projectKey);
-    console.log(`Found project ${JSON.parse(project)}`);
     if (component && !project.components.find((list) => list.name === component)) {
       throw new Error(`'${component}' is not a valid JIRA component in project '${projectKey}'`);
     }
 
     const release = await getOrCreateRelease(client, project, name);
-    console.log(JSON.parse(release));
+    console.log(release);
     const requests = [];
-    for(const issue in issueKeys) {
+    await issueKeys.forEach(async (issue) => {
       requests.push(
         client.updateIssue(issue, createUpdate(release)).then(() => {
           core.info(`Issue ${issue} was updated with fix version`);
         }),
       );
-    }
+    });
     await Promise.all(requests);
 
   });
