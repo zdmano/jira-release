@@ -45218,7 +45218,10 @@ const createJiraRelease = async ({
   });
 
   const issueKeys = new Set(String(jiraKeys).split(","));
-
+  if(issueKeys.size < 1) {
+    console.log('No Jira keys provided ... quiting');
+    return true;
+  } 
   let projectKeys = new Set();
   
   for (const issue of issueKeys) {
@@ -45250,37 +45253,6 @@ const createJiraRelease = async ({
     await Promise.all(requests);
 
   });
-
-
-
-
-
-
-  // const changes = await findJiraChanges(projectKey);
-  // Object.keys(changes).forEach((issueKey) => {
-
-  // });
-  // await Promise.all(requests);
-
-  // if (!release.released && publishVersion) {
-  //   core.info(`Release version ${name}`);
-  //   await client.updateVersion({
-  //     id: release.id,
-  //     projectId: release.projectId,
-  //     releaseDate: new Date().toISOString().split('T')[0],
-  //     released: true,
-  //   }).then(() => {
-  //     core.info(`Version ${name} is now released`);
-  //   }).catch((err) => {
-  //     core.error(`Failed to release version ${name}. It must be manually released in JIRA. Reason: ${err.message}`);
-  //     return null;
-  //   });
-  // } else {
-  //   core.warning(`Version ${name} was already released in JIRA or publish option is false`);
-  // }
-
-  // Return the release name
-  console.log('Done');
   return true;
 };
 

@@ -63,7 +63,10 @@ const createJiraRelease = async ({
   });
 
   const issueKeys = new Set(String(jiraKeys).split(","));
-
+  if(issueKeys.size < 1) {
+    console.log('No Jira keys provided ... quiting');
+    return true;
+  } 
   let projectKeys = new Set();
   
   for (const issue of issueKeys) {
